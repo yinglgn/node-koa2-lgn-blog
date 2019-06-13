@@ -5,6 +5,9 @@ const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
+const jwt = require('koa-jwt')
+const config = require('./config/config')
+const auth = require('./auth/index')
 
 const index = require('./routes/index')
 
@@ -23,6 +26,11 @@ app.use(views(__dirname + '/views', {
   extension: 'pug'
 }))
 
+app.use(auth.verification());
+
+// Middleware below this line is only reached if JWT token is valid
+app.use(jwt({secret: config.session.secrets}).unless({path: [/^\/auth\/login/]}));
+
 // logger
 app.use(async (ctx, next) => {
   const start = new Date()
@@ -31,12 +39,12 @@ app.use(async (ctx, next) => {
   console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
 })
 
-// routes
-app.use(index.routes(), index.allowedMethods())
-
 // error-handling
 app.on('error', (err, ctx) => {
   console.error('server error', err, ctx)
 });
+
+// routes
+app.use(index.routes(), index.allowedMethods())
 
 module.exports = app

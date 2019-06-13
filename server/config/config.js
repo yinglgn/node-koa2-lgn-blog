@@ -26,5 +26,9 @@ module.exports = {
     //     ca: fs.readFileSync(__dirname + '/mysql-ca-master.crt')
     //   }
     // }
+  },
+  session: {
+    secrets: 'lgnxbd',
+    expiresIn: "10h"
   }
 };
