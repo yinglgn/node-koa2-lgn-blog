@@ -34,5 +34,16 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 db.Op = Sequelize.Op;
+db.Transaction = (fun) => {
+  return sequelize.transaction(fun).then(function (result) {
+    // Transaction 会自动提交
+    // result 是事务回调中使用promise链中执行结果
+    return true
+  }).catch(function (err) {
+    // Transaction 会自动回滚
+    // err 是事务回调中使用promise链中的异常结果
+    return false
+  })
+}
 
 module.exports = db;
